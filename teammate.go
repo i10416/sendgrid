@@ -295,7 +295,7 @@ type OutputCreateSSOTeammate struct {
 
 type OutputSubuserAccess struct {
 	ID             int64    `json:"id,omitempty"`
-	Username       int64    `json:"username,omitempty"`
+	Username       string    `json:"username,omitempty"`
 	Email          string   `json:"email,omitempty"`
 	Disabled       bool     `json:"disabled,omitempty"`
 	PermissionType string   `json:"permission_type,omitempty"`
