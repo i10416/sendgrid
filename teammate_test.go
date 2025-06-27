@@ -105,7 +105,7 @@ func TestGetTeammates(t *testing.T) {
 		}
 	})
 
-	expected, err := client.GetTeammates(context.TODO())
+	expected, err := client.GetTeammates(context.TODO(), nil)
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
@@ -144,9 +144,66 @@ func TestGetTeammates_Failed(t *testing.T) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 
-	_, err := client.GetTeammates(context.TODO())
+	_, err := client.GetTeammates(context.TODO(), nil)
 	if err == nil {
 		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestGetTeammatesWithPagination(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/teammates", func(w http.ResponseWriter, r *http.Request) {
+		// クエリパラメータを確認
+		limit := r.URL.Query().Get("limit")
+		offset := r.URL.Query().Get("offset")
+
+		if limit != "10" {
+			t.Errorf("Expected limit=10, got %s", limit)
+		}
+		if offset != "5" {
+			t.Errorf("Expected offset=5, got %s", offset)
+		}
+
+		if _, err := fmt.Fprint(w, `{"result":[{
+			"username": "dummy",
+			"email": "dummy@example.com",
+			"first_name": "Kenzo",
+			"last_name": "Tanaka",
+			"is_admin": false,
+			"user_type": "teammate",
+			"scopes": []
+		  }]}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	input := &InputGetTeammates{
+		Limit:  10,
+		Offset: 5,
+	}
+
+	expected, err := client.GetTeammates(context.TODO(), input)
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+
+	want := &OutputGetTeammates{
+		Teammates: []Teammate{
+			{
+				Username:  "dummy",
+				Email:     "dummy@example.com",
+				FirstName: "Kenzo",
+				LastName:  "Tanaka",
+				IsAdmin:   false,
+				UserType:  "teammate",
+			},
+		},
+	}
+	if !reflect.DeepEqual(want, expected) {
+		t.Fatal(ErrIncorrectResponse)
 	}
 }
 

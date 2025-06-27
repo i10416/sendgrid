@@ -67,12 +67,33 @@ type Teammate struct {
 	Country   string `json:"country,omitempty"`
 }
 
+type InputGetTeammates struct {
+	Limit  int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
+}
+
 type OutputGetTeammates struct {
 	Teammates []Teammate `json:"result,omitempty"`
 }
 
-func (c *Client) GetTeammates(ctx context.Context) (*OutputGetTeammates, error) {
-	req, err := c.NewRequest("GET", "/teammates", nil)
+func (c *Client) GetTeammates(ctx context.Context, input *InputGetTeammates) (*OutputGetTeammates, error) {
+	u, err := url.Parse("/teammates")
+	if err != nil {
+		return nil, err
+	}
+
+	if input != nil {
+		q := u.Query()
+		if input.Limit > 0 {
+			q.Set("limit", strconv.Itoa(input.Limit))
+		}
+		if input.Offset > 0 {
+			q.Set("offset", strconv.Itoa(input.Offset))
+		}
+		u.RawQuery = q.Encode()
+	}
+
+	req, err := c.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +316,7 @@ type OutputCreateSSOTeammate struct {
 
 type OutputSubuserAccess struct {
 	ID             int64    `json:"id,omitempty"`
-	Username       string    `json:"username,omitempty"`
+	Username       string   `json:"username,omitempty"`
 	Email          string   `json:"email,omitempty"`
 	Disabled       bool     `json:"disabled,omitempty"`
 	PermissionType string   `json:"permission_type,omitempty"`
