@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -397,4 +398,287 @@ func TestGetSubuserMonthlyStats_Failed(t *testing.T) {
 
 	_, err := client.GetSubuserMonthlyStats(context.TODO(), nil)
 	assert.Error(t, err)
+}
+
+func TestGetGlobalStats_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Set a baseURL with trailing slash which causes NewRequest to return an error
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetGlobalStats(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	// Restore original baseURL
+	client.baseURL = originalBaseURL
+}
+
+func TestGetCategoryStats_WithOptions(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/categories/stats", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "newsletter", r.URL.Query().Get("categories"))
+		assert.Equal(t, "2025-01-01", r.URL.Query().Get("start_date"))
+		assert.Equal(t, "2025-01-31", r.URL.Query().Get("end_date"))
+		if _, err := fmt.Fprint(w, `[]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	opts := &StatsOptions{
+		StartDate: "2025-01-01",
+		EndDate:   "2025-01-31",
+	}
+	categories := []string{"newsletter"}
+	_, err := client.GetCategoryStats(context.TODO(), categories, opts)
+	assert.NoError(t, err)
+}
+
+func TestGetCategoryStats_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Set a baseURL with trailing slash which causes NewRequest to return an error
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	categories := []string{"newsletter"}
+	_, err := client.GetCategoryStats(context.TODO(), categories, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	// Restore original baseURL
+	client.baseURL = originalBaseURL
+}
+
+func TestGetCategorySums_WithOptions(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/categories/stats/sums", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "2025-01-01", r.URL.Query().Get("start_date"))
+		assert.Equal(t, "2025-01-31", r.URL.Query().Get("end_date"))
+		if _, err := fmt.Fprint(w, `[]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	opts := &StatsOptions{
+		StartDate: "2025-01-01",
+		EndDate:   "2025-01-31",
+	}
+	_, err := client.GetCategorySums(context.TODO(), opts)
+	assert.NoError(t, err)
+}
+
+func TestGetCategorySums_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Set a baseURL with trailing slash which causes NewRequest to return an error
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetCategorySums(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	// Restore original baseURL
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSubuserStats_WithOptions(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "subuser1", r.URL.Query().Get("subusers"))
+		assert.Equal(t, "2025-01-01", r.URL.Query().Get("start_date"))
+		assert.Equal(t, "2025-01-31", r.URL.Query().Get("end_date"))
+		if _, err := fmt.Fprint(w, `[]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	opts := &StatsOptions{
+		StartDate: "2025-01-01",
+		EndDate:   "2025-01-31",
+	}
+	subusers := []string{"subuser1"}
+	_, err := client.GetSubuserStats(context.TODO(), subusers, opts)
+	assert.NoError(t, err)
+}
+
+func TestGetSubuserStats_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Set a baseURL with trailing slash which causes NewRequest to return an error
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	subusers := []string{"subuser1"}
+	_, err := client.GetSubuserStats(context.TODO(), subusers, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	// Restore original baseURL
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSubuserSums_WithOptions(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats/sums", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "2025-01-01", r.URL.Query().Get("start_date"))
+		assert.Equal(t, "2025-01-31", r.URL.Query().Get("end_date"))
+		if _, err := fmt.Fprint(w, `[]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	opts := &StatsOptions{
+		StartDate: "2025-01-01",
+		EndDate:   "2025-01-31",
+	}
+	_, err := client.GetSubuserSums(context.TODO(), opts)
+	assert.NoError(t, err)
+}
+
+func TestGetSubuserSums_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Set a baseURL with trailing slash which causes NewRequest to return an error
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSubuserSums(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	// Restore original baseURL
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSubuserMonthlyStats_WithOptions(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats/monthly", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "2025-01-01", r.URL.Query().Get("start_date"))
+		assert.Equal(t, "2025-01-31", r.URL.Query().Get("end_date"))
+		if _, err := fmt.Fprint(w, `[]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	opts := &StatsOptions{
+		StartDate: "2025-01-01",
+		EndDate:   "2025-01-31",
+	}
+	_, err := client.GetSubuserMonthlyStats(context.TODO(), opts)
+	assert.NoError(t, err)
+}
+
+func TestGetSubuserMonthlyStats_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Set a baseURL with trailing slash which causes NewRequest to return an error
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSubuserMonthlyStats(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	// Restore original baseURL
+	client.baseURL = originalBaseURL
+}
+
+func TestStat(t *testing.T) {
+	stat := Stat{
+		Date: "2025-01-01",
+		Stats: []StatItem{
+			{
+				Name: "test",
+				Type: "category",
+				Metrics: StatMetrics{
+					Delivered: 100,
+					Opens:     30,
+					Clicks:    10,
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, "2025-01-01", stat.Date)
+	assert.Len(t, stat.Stats, 1)
+	assert.Equal(t, "test", stat.Stats[0].Name)
+	assert.Equal(t, "category", stat.Stats[0].Type)
+	assert.Equal(t, 100, stat.Stats[0].Metrics.Delivered)
+	assert.Equal(t, 30, stat.Stats[0].Metrics.Opens)
+	assert.Equal(t, 10, stat.Stats[0].Metrics.Clicks)
+}
+
+func TestCategoryStat(t *testing.T) {
+	stat := CategoryStat{
+		Date: "2025-01-01",
+		Stats: []StatItem{
+			{
+				Name: "newsletter",
+				Type: "category",
+				Metrics: StatMetrics{
+					Delivered: 200,
+					Opens:     60,
+					Clicks:    20,
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, "2025-01-01", stat.Date)
+	assert.Len(t, stat.Stats, 1)
+	assert.Equal(t, "newsletter", stat.Stats[0].Name)
+	assert.Equal(t, "category", stat.Stats[0].Type)
+	assert.Equal(t, 200, stat.Stats[0].Metrics.Delivered)
+	assert.Equal(t, 60, stat.Stats[0].Metrics.Opens)
+	assert.Equal(t, 20, stat.Stats[0].Metrics.Clicks)
+}
+
+func TestSubuserStat(t *testing.T) {
+	stat := SubuserStat{
+		Date: "2025-01-01",
+		Stats: []StatItem{
+			{
+				Name: "subuser1",
+				Type: "subuser",
+				Metrics: StatMetrics{
+					Delivered: 300,
+					Opens:     90,
+					Clicks:    30,
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, "2025-01-01", stat.Date)
+	assert.Len(t, stat.Stats, 1)
+	assert.Equal(t, "subuser1", stat.Stats[0].Name)
+	assert.Equal(t, "subuser", stat.Stats[0].Type)
+	assert.Equal(t, 300, stat.Stats[0].Metrics.Delivered)
+	assert.Equal(t, 90, stat.Stats[0].Metrics.Opens)
+	assert.Equal(t, 30, stat.Stats[0].Metrics.Clicks)
 }
