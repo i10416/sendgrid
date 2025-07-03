@@ -146,6 +146,25 @@ func TestCreateAPIKey(t *testing.T) {
 	}
 }
 
+func TestCreateAPIKey_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api_keys", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.CreateAPIKey(context.TODO(), &InputCreateAPIKey{
+		Name: "dummy",
+		Scopes: []string{
+			"user.profile.read",
+		},
+	})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
 func TestUpdateAPIKeyName(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -231,6 +250,26 @@ func TestUpdateAPIKeyNameAndScopes(t *testing.T) {
 	}
 	if !reflect.DeepEqual(want, expected) {
 		t.Fatal(ErrIncorrectResponse, errors.New(pretty.Compare(want, expected)))
+	}
+}
+
+func TestUpdateAPIKeyNameAndScopes_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api_keys/dummy", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.UpdateAPIKeyNameAndScopes(context.TODO(), "dummy", &InputUpdateAPIKeyNameAndScopes{
+		Name: "full-accesses-dummy",
+		Scopes: []string{
+			"user.profile.read",
+			"user.profile.update",
+		},
+	})
+	if err == nil {
+		t.Fatal("expected an error but got none")
 	}
 }
 

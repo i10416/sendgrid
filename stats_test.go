@@ -1,6 +1,9 @@
 package sendgrid
 
 import (
+	"context"
+	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -98,4 +101,300 @@ func TestStatItem(t *testing.T) {
 	assert.Equal(t, 500, item.Metrics.Delivered)
 	assert.Equal(t, 150, item.Metrics.Opens)
 	assert.Equal(t, 50, item.Metrics.Clicks)
+}
+
+func TestGetGlobalStats(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := fmt.Fprint(w, `[
+			{
+				"date": "2025-01-01",
+				"stats": {
+					"delivered": 1000,
+					"opens": 300,
+					"clicks": 100
+				}
+			}
+		]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	stats, err := client.GetGlobalStats(context.TODO(), nil)
+	assert.NoError(t, err)
+	assert.Len(t, stats, 1)
+	assert.Equal(t, "2025-01-01", stats[0].Date)
+	assert.Equal(t, 1000, stats[0].Stats.Delivered)
+	assert.Equal(t, 300, stats[0].Stats.Opens)
+	assert.Equal(t, 100, stats[0].Stats.Clicks)
+}
+
+func TestGetGlobalStats_WithOptions(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "2025-01-01", r.URL.Query().Get("start_date"))
+		assert.Equal(t, "2025-01-31", r.URL.Query().Get("end_date"))
+		assert.Equal(t, "day", r.URL.Query().Get("aggregated_by"))
+		if _, err := fmt.Fprint(w, `[]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	opts := &StatsOptions{
+		StartDate:   "2025-01-01",
+		EndDate:     "2025-01-31",
+		Aggregation: "day",
+	}
+	_, err := client.GetGlobalStats(context.TODO(), opts)
+	assert.NoError(t, err)
+}
+
+func TestGetGlobalStats_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.GetGlobalStats(context.TODO(), nil)
+	assert.Error(t, err)
+}
+
+func TestGetCategoryStats(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/categories/stats", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "newsletter,promotion", r.URL.Query().Get("categories"))
+		if _, err := fmt.Fprint(w, `[
+			{
+				"date": "2025-01-01",
+				"stats": [
+					{
+						"name": "newsletter",
+						"type": "category",
+						"metrics": {
+							"delivered": 500,
+							"opens": 150,
+							"clicks": 50
+						}
+					}
+				]
+			}
+		]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	categories := []string{"newsletter", "promotion"}
+	stats, err := client.GetCategoryStats(context.TODO(), categories, nil)
+	assert.NoError(t, err)
+	assert.Len(t, stats, 1)
+	assert.Equal(t, "2025-01-01", stats[0].Date)
+	assert.Len(t, stats[0].Stats, 1)
+	assert.Equal(t, "newsletter", stats[0].Stats[0].Name)
+	assert.Equal(t, "category", stats[0].Stats[0].Type)
+}
+
+func TestGetCategoryStats_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/categories/stats", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	categories := []string{"newsletter"}
+	_, err := client.GetCategoryStats(context.TODO(), categories, nil)
+	assert.Error(t, err)
+}
+
+func TestGetCategorySums(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/categories/stats/sums", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := fmt.Fprint(w, `[
+			{
+				"date": "2025-01-01",
+				"stats": [
+					{
+						"name": "newsletter",
+						"type": "category",
+						"metrics": {
+							"delivered": 1000,
+							"opens": 300,
+							"clicks": 100
+						}
+					}
+				]
+			}
+		]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	stats, err := client.GetCategorySums(context.TODO(), nil)
+	assert.NoError(t, err)
+	assert.Len(t, stats, 1)
+	assert.Equal(t, "2025-01-01", stats[0].Date)
+	assert.Len(t, stats[0].Stats, 1)
+	assert.Equal(t, "newsletter", stats[0].Stats[0].Name)
+}
+
+func TestGetCategorySums_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/categories/stats/sums", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.GetCategorySums(context.TODO(), nil)
+	assert.Error(t, err)
+}
+
+func TestGetSubuserStats(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "subuser1,subuser2", r.URL.Query().Get("subusers"))
+		if _, err := fmt.Fprint(w, `[
+			{
+				"date": "2025-01-01",
+				"stats": [
+					{
+						"name": "subuser1",
+						"type": "subuser",
+						"metrics": {
+							"delivered": 500,
+							"opens": 150,
+							"clicks": 50
+						}
+					}
+				]
+			}
+		]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	subusers := []string{"subuser1", "subuser2"}
+	stats, err := client.GetSubuserStats(context.TODO(), subusers, nil)
+	assert.NoError(t, err)
+	assert.Len(t, stats, 1)
+	assert.Equal(t, "2025-01-01", stats[0].Date)
+	assert.Len(t, stats[0].Stats, 1)
+	assert.Equal(t, "subuser1", stats[0].Stats[0].Name)
+	assert.Equal(t, "subuser", stats[0].Stats[0].Type)
+}
+
+func TestGetSubuserStats_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	subusers := []string{"subuser1"}
+	_, err := client.GetSubuserStats(context.TODO(), subusers, nil)
+	assert.Error(t, err)
+}
+
+func TestGetSubuserSums(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats/sums", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := fmt.Fprint(w, `[
+			{
+				"date": "2025-01-01",
+				"stats": [
+					{
+						"name": "subuser1",
+						"type": "subuser",
+						"metrics": {
+							"delivered": 1000,
+							"opens": 300,
+							"clicks": 100
+						}
+					}
+				]
+			}
+		]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	stats, err := client.GetSubuserSums(context.TODO(), nil)
+	assert.NoError(t, err)
+	assert.Len(t, stats, 1)
+	assert.Equal(t, "2025-01-01", stats[0].Date)
+	assert.Len(t, stats[0].Stats, 1)
+	assert.Equal(t, "subuser1", stats[0].Stats[0].Name)
+}
+
+func TestGetSubuserSums_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats/sums", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.GetSubuserSums(context.TODO(), nil)
+	assert.Error(t, err)
+}
+
+func TestGetSubuserMonthlyStats(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats/monthly", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := fmt.Fprint(w, `[
+			{
+				"date": "2025-01-01",
+				"stats": [
+					{
+						"name": "subuser1",
+						"type": "subuser",
+						"metrics": {
+							"delivered": 30000,
+							"opens": 9000,
+							"clicks": 3000
+						}
+					}
+				]
+			}
+		]`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	stats, err := client.GetSubuserMonthlyStats(context.TODO(), nil)
+	assert.NoError(t, err)
+	assert.Len(t, stats, 1)
+	assert.Equal(t, "2025-01-01", stats[0].Date)
+	assert.Len(t, stats[0].Stats, 1)
+	assert.Equal(t, "subuser1", stats[0].Stats[0].Name)
+	assert.Equal(t, 30000, stats[0].Stats[0].Metrics.Delivered)
+}
+
+func TestGetSubuserMonthlyStats_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/subusers/stats/monthly", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.GetSubuserMonthlyStats(context.TODO(), nil)
+	assert.Error(t, err)
 }

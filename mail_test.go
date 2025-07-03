@@ -1,6 +1,9 @@
 package sendgrid
 
 import (
+	"context"
+	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -230,4 +233,189 @@ func TestSendMailStructure(t *testing.T) {
 	assert.Len(t, mail.Categories, 2)
 	assert.NotNil(t, mail.MailSettings)
 	assert.NotNil(t, mail.TrackingSettings)
+}
+
+func TestSendMail(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/mail/send", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+		w.WriteHeader(http.StatusAccepted)
+		if _, err := fmt.Fprint(w, `{"message":"success"}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("from@example.com", "From User"))
+	mail.SetSubject("Test Email")
+
+	p := NewPersonalization()
+	p.AddTo(NewEmail("to@example.com", "To User"))
+	mail.AddPersonalization(p)
+
+	mail.AddContent(NewContent("text/plain", "Hello, World!"))
+
+	result, err := client.SendMail(context.TODO(), mail)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestSendMail_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/mail/send", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		if _, err := fmt.Fprint(w, `{"errors":[{"message":"Invalid email address"}]}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("invalid-email", "From User"))
+	mail.SetSubject("Test Email")
+
+	p := NewPersonalization()
+	p.AddTo(NewEmail("to@example.com", "To User"))
+	mail.AddPersonalization(p)
+
+	mail.AddContent(NewContent("text/plain", "Hello, World!"))
+
+	_, err := client.SendMail(context.TODO(), mail)
+	assert.Error(t, err)
+}
+
+func TestSendMail_WithTemplate(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/mail/send", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.WriteHeader(http.StatusAccepted)
+		if _, err := fmt.Fprint(w, `{"message":"success"}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("from@example.com", "From User"))
+	mail.SetTemplateID("d-123456789")
+
+	p := NewPersonalization()
+	p.AddTo(NewEmail("to@example.com", "To User"))
+	p.DynamicTemplateData = map[string]interface{}{
+		"name":    "John Doe",
+		"product": "Amazing Product",
+	}
+	mail.AddPersonalization(p)
+
+	result, err := client.SendMail(context.TODO(), mail)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestSendMail_WithAttachment(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/mail/send", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.WriteHeader(http.StatusAccepted)
+		if _, err := fmt.Fprint(w, `{"message":"success"}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("from@example.com", "From User"))
+	mail.SetSubject("Email with Attachment")
+
+	p := NewPersonalization()
+	p.AddTo(NewEmail("to@example.com", "To User"))
+	mail.AddPersonalization(p)
+
+	mail.AddContent(NewContent("text/plain", "Please find the attachment."))
+
+	attachment := &Attachment{
+		Content:     "VGhpcyBpcyBhIHRlc3QgYXR0YWNobWVudA==", // base64 encoded
+		Type:        "text/plain",
+		Filename:    "test.txt",
+		Disposition: "attachment",
+		ContentID:   "test-content-id",
+	}
+	mail.AddAttachment(attachment)
+
+	result, err := client.SendMail(context.TODO(), mail)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestSendMail_WithScheduledSend(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/mail/send", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.WriteHeader(http.StatusAccepted)
+		if _, err := fmt.Fprint(w, `{"message":"success"}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("from@example.com", "From User"))
+	mail.SetSubject("Scheduled Email")
+
+	// Set send time to 1 hour from now
+	sendTime := time.Now().Add(time.Hour)
+	mail.SetSendAt(sendTime)
+
+	p := NewPersonalization()
+	p.AddTo(NewEmail("to@example.com", "To User"))
+	mail.AddPersonalization(p)
+
+	mail.AddContent(NewContent("text/plain", "This is a scheduled email."))
+
+	result, err := client.SendMail(context.TODO(), mail)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestSendMail_WithMultipleRecipients(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/mail/send", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.WriteHeader(http.StatusAccepted)
+		if _, err := fmt.Fprint(w, `{"message":"success"}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("from@example.com", "From User"))
+	mail.SetSubject("Multiple Recipients Email")
+
+	// First personalization
+	p1 := NewPersonalization()
+	p1.AddTo(NewEmail("to1@example.com", "To User 1"))
+	p1.AddCc(NewEmail("cc1@example.com", "CC User 1"))
+	p1.AddBcc(NewEmail("bcc1@example.com", "BCC User 1"))
+	mail.AddPersonalization(p1)
+
+	// Second personalization
+	p2 := NewPersonalization()
+	p2.AddTo(NewEmail("to2@example.com", "To User 2"))
+	mail.AddPersonalization(p2)
+
+	mail.AddContent(NewContent("text/plain", "Hello to all recipients!"))
+	mail.AddContent(NewContent("text/html", "<h1>Hello to all recipients!</h1>"))
+
+	result, err := client.SendMail(context.TODO(), mail)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
 }
