@@ -85,7 +85,7 @@ func TestGetIPAddresses(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"ip":"192.168.1.1","pools":["pool1"],"warmup":true,"start_date":1609459200,"subusers":["subuser1"],"rdns":"example.com","assigned_at":1609459300}]`))
+		_, _ = w.Write([]byte(`[{"ip":"192.168.1.1","pools":["pool1"],"warmup":true,"start_date":1609459200,"subusers":["subuser1"],"rdns":"example.com","assigned_at":1609459300}]`))
 	})
 
 	ctx := context.Background()
@@ -110,7 +110,7 @@ func TestGetAssignedIPAddresses(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"ip":"192.168.1.1","pools":["pool1"],"warmup":false}]`))
+		_, _ = w.Write([]byte(`[{"ip":"192.168.1.1","pools":["pool1"],"warmup":false}]`))
 	})
 
 	ctx := context.Background()
@@ -131,7 +131,7 @@ func TestGetRemainingIPCount(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"remaining":5,"total":10}`))
+		_, _ = w.Write([]byte(`{"remaining":5,"total":10}`))
 	})
 
 	ctx := context.Background()
@@ -150,7 +150,7 @@ func TestGetIPAddress(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1","pools":["pool1"],"warmup":true,"rdns":"example.com"}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1","pools":["pool1"],"warmup":true,"rdns":"example.com"}`))
 	})
 
 	ctx := context.Background()
@@ -171,7 +171,7 @@ func TestGetIPPools(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"name":"pool1"},{"name":"pool2"}]`))
+		_, _ = w.Write([]byte(`[{"name":"pool1"},{"name":"pool2"}]`))
 	})
 
 	ctx := context.Background()
@@ -191,7 +191,7 @@ func TestCreateIPPool(t *testing.T) {
 		testMethod(t, r, "POST")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"name":"new-pool"}`))
+		_, _ = w.Write([]byte(`{"name":"new-pool"}`))
 	})
 
 	ctx := context.Background()
@@ -209,7 +209,7 @@ func TestGetIPPool(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"name":"test-pool"}`))
+		_, _ = w.Write([]byte(`{"name":"test-pool"}`))
 	})
 
 	ctx := context.Background()
@@ -227,7 +227,7 @@ func TestUpdateIPPool(t *testing.T) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"name":"new-pool"}`))
+		_, _ = w.Write([]byte(`{"name":"new-pool"}`))
 	})
 
 	ctx := context.Background()
@@ -290,7 +290,7 @@ func TestStartIPWarmup(t *testing.T) {
 		testMethod(t, r, "POST")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1","warmup":true}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1","warmup":true}`))
 	})
 
 	ctx := context.Background()
@@ -309,7 +309,7 @@ func TestStopIPWarmup(t *testing.T) {
 		testMethod(t, r, "DELETE")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1","warmup":false}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1","warmup":false}`))
 	})
 
 	ctx := context.Background()
@@ -328,7 +328,7 @@ func TestGetIPWarmupStatus(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1","warmup":true}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1","warmup":true}`))
 	})
 
 	ctx := context.Background()
@@ -347,7 +347,7 @@ func TestGetAllIPWarmupStatus(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"ip":"192.168.1.1","warmup":true},{"ip":"192.168.1.2","warmup":false}]`))
+		_, _ = w.Write([]byte(`[{"ip":"192.168.1.1","warmup":true},{"ip":"192.168.1.2","warmup":false}]`))
 	})
 
 	ctx := context.Background()
@@ -369,7 +369,7 @@ func TestGetIPAddresses_Failed(t *testing.T) {
 	mux.HandleFunc("/ips", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -385,7 +385,7 @@ func TestGetAssignedIPAddresses_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/assigned", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -401,7 +401,7 @@ func TestGetRemainingIPCount_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/remaining", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -417,7 +417,7 @@ func TestGetIPAddress_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/192.168.1.1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "IP address not found"}`))
+		_, _ = w.Write([]byte(`{"error": "IP address not found"}`))
 	})
 
 	ctx := context.Background()
@@ -433,7 +433,7 @@ func TestGetIPPools_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -449,7 +449,7 @@ func TestCreateIPPool_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "Invalid pool name"}`))
+		_, _ = w.Write([]byte(`{"error": "Invalid pool name"}`))
 	})
 
 	ctx := context.Background()
@@ -465,7 +465,7 @@ func TestGetIPPool_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools/test-pool", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Pool not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Pool not found"}`))
 	})
 
 	ctx := context.Background()
@@ -481,7 +481,7 @@ func TestUpdateIPPool_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools/old-pool", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "PUT")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Pool not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Pool not found"}`))
 	})
 
 	ctx := context.Background()
@@ -497,7 +497,7 @@ func TestDeleteIPPool_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools/test-pool", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Pool not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Pool not found"}`))
 	})
 
 	ctx := context.Background()
@@ -513,7 +513,7 @@ func TestAddIPToPool_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools/test-pool/ips", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "Invalid IP address"}`))
+		_, _ = w.Write([]byte(`{"error": "Invalid IP address"}`))
 	})
 
 	ctx := context.Background()
@@ -529,7 +529,7 @@ func TestRemoveIPFromPool_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/pools/test-pool/ips/192.168.1.1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "IP not found in pool"}`))
+		_, _ = w.Write([]byte(`{"error": "IP not found in pool"}`))
 	})
 
 	ctx := context.Background()
@@ -545,7 +545,7 @@ func TestStartIPWarmup_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/warmup/192.168.1.1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "IP already in warmup"}`))
+		_, _ = w.Write([]byte(`{"error": "IP already in warmup"}`))
 	})
 
 	ctx := context.Background()
@@ -561,7 +561,7 @@ func TestStopIPWarmup_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/warmup/192.168.1.1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "IP not in warmup"}`))
+		_, _ = w.Write([]byte(`{"error": "IP not in warmup"}`))
 	})
 
 	ctx := context.Background()
@@ -577,7 +577,7 @@ func TestGetIPWarmupStatus_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/warmup/192.168.1.1", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "IP not found"}`))
+		_, _ = w.Write([]byte(`{"error": "IP not found"}`))
 	})
 
 	ctx := context.Background()
@@ -593,7 +593,7 @@ func TestGetAllIPWarmupStatus_Failed(t *testing.T) {
 	mux.HandleFunc("/ips/warmup", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -611,7 +611,7 @@ func TestGetIPAddress_URLEscape(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1/24","pools":["pool1"]}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1/24","pools":["pool1"]}`))
 	})
 
 	ctx := context.Background()
@@ -630,7 +630,7 @@ func TestGetIPPool_URLEscape(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"name":"pool name"}`))
+		_, _ = w.Write([]byte(`{"name":"pool name"}`))
 	})
 
 	ctx := context.Background()
@@ -649,7 +649,7 @@ func TestUpdateIPPool_URLEscape(t *testing.T) {
 		testMethod(t, r, "PUT")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"name":"new pool"}`))
+		_, _ = w.Write([]byte(`{"name":"new pool"}`))
 	})
 
 	ctx := context.Background()
@@ -713,7 +713,7 @@ func TestStartIPWarmup_URLEscape(t *testing.T) {
 		testMethod(t, r, "POST")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1/24","warmup":true}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1/24","warmup":true}`))
 	})
 
 	ctx := context.Background()
@@ -733,7 +733,7 @@ func TestStopIPWarmup_URLEscape(t *testing.T) {
 		testMethod(t, r, "DELETE")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1/24","warmup":false}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1/24","warmup":false}`))
 	})
 
 	ctx := context.Background()
@@ -753,7 +753,7 @@ func TestGetIPWarmupStatus_URLEscape(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"ip":"192.168.1.1/24","warmup":true}`))
+		_, _ = w.Write([]byte(`{"ip":"192.168.1.1/24","warmup":true}`))
 	})
 
 	ctx := context.Background()

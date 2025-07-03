@@ -105,7 +105,7 @@ func TestGetBounces(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"550 5.1.1 User unknown","status":"5.1.1"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"550 5.1.1 User unknown","status":"5.1.1"}]`))
 	})
 
 	ctx := context.Background()
@@ -129,7 +129,7 @@ func TestGetBouncesWithOptions(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("offset"), "10")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -150,7 +150,7 @@ func TestGetBounces_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/bounces", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -167,7 +167,7 @@ func TestGetBounce(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"550 5.1.1 User unknown","status":"5.1.1"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"550 5.1.1 User unknown","status":"5.1.1"}]`))
 	})
 
 	ctx := context.Background()
@@ -186,7 +186,7 @@ func TestGetBounce_NotFound(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -203,7 +203,7 @@ func TestGetBounce_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/bounces/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -237,7 +237,7 @@ func TestDeleteBounces_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/bounces", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -271,7 +271,7 @@ func TestDeleteBounce_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/bounces/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Bounce not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Bounce not found"}`))
 	})
 
 	ctx := context.Background()
@@ -289,7 +289,7 @@ func TestGetBlocks(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"IP temporarily blocked"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"IP temporarily blocked"}]`))
 	})
 
 	ctx := context.Background()
@@ -309,7 +309,7 @@ func TestGetBlocks_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/blocks", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -326,7 +326,7 @@ func TestGetBlock(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"IP temporarily blocked"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","reason":"IP temporarily blocked"}]`))
 	})
 
 	ctx := context.Background()
@@ -345,7 +345,7 @@ func TestGetBlock_NotFound(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -362,7 +362,7 @@ func TestGetBlock_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/blocks/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -396,7 +396,7 @@ func TestDeleteBlocks_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/blocks", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -430,7 +430,7 @@ func TestDeleteBlock_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/blocks/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Block not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Block not found"}`))
 	})
 
 	ctx := context.Background()
@@ -448,7 +448,7 @@ func TestGetSpamReports(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","ip":"192.168.1.1"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","ip":"192.168.1.1"}]`))
 	})
 
 	ctx := context.Background()
@@ -468,7 +468,7 @@ func TestGetSpamReports_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/spam_reports", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -485,7 +485,7 @@ func TestGetSpamReport(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","ip":"192.168.1.1"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"test@example.com","ip":"192.168.1.1"}]`))
 	})
 
 	ctx := context.Background()
@@ -504,7 +504,7 @@ func TestGetSpamReport_NotFound(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -521,7 +521,7 @@ func TestGetSpamReport_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/spam_reports/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -555,7 +555,7 @@ func TestDeleteSpamReports_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/spam_reports", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -589,7 +589,7 @@ func TestDeleteSpamReport_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/spam_reports/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Spam report not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Spam report not found"}`))
 	})
 
 	ctx := context.Background()
@@ -607,7 +607,7 @@ func TestGetInvalidEmails(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"invalid@example.com","reason":"Mail domain mentioned in email address is unknown"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"invalid@example.com","reason":"Mail domain mentioned in email address is unknown"}]`))
 	})
 
 	ctx := context.Background()
@@ -627,7 +627,7 @@ func TestGetInvalidEmails_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/invalid_emails", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -644,7 +644,7 @@ func TestGetInvalidEmail(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[{"created":1609459200,"email":"invalid@example.com","reason":"Mail domain mentioned in email address is unknown"}]`))
+		_, _ = w.Write([]byte(`[{"created":1609459200,"email":"invalid@example.com","reason":"Mail domain mentioned in email address is unknown"}]`))
 	})
 
 	ctx := context.Background()
@@ -663,7 +663,7 @@ func TestGetInvalidEmail_NotFound(t *testing.T) {
 		testMethod(t, r, "GET")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -680,7 +680,7 @@ func TestGetInvalidEmail_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/invalid_emails/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -714,7 +714,7 @@ func TestDeleteInvalidEmails_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/invalid_emails", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Internal server error"}`))
+		_, _ = w.Write([]byte(`{"error": "Internal server error"}`))
 	})
 
 	ctx := context.Background()
@@ -748,7 +748,7 @@ func TestDeleteInvalidEmail_Failed(t *testing.T) {
 	mux.HandleFunc("/suppression/invalid_emails/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"error": "Invalid email not found"}`))
+		_, _ = w.Write([]byte(`{"error": "Invalid email not found"}`))
 	})
 
 	ctx := context.Background()
@@ -769,7 +769,7 @@ func TestGetBounces_AddOptionsPath(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("end_time"), "1612137600")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -792,7 +792,7 @@ func TestGetBlocks_WithOptions(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("limit"), "25")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -814,7 +814,7 @@ func TestGetSpamReports_WithOptions(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("limit"), "30")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
@@ -836,7 +836,7 @@ func TestGetInvalidEmails_WithOptions(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("limit"), "20")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`[]`))
+		_, _ = w.Write([]byte(`[]`))
 	})
 
 	ctx := context.Background()
