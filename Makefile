@@ -13,22 +13,22 @@ fmt:
 
 ## Execute unit tests
 test:
-	@go test -v -count=1 -timeout 300s -short ./...
+	@go test -v -count=1 -timeout 300s -short $$(go list ./... | grep -v examples)
 .PHONY: test
 
 ## Execute race tests
 test-race:
-	@go test -v -count=1 -timeout 300s -short -race ./...
+	@go test -v -count=1 -timeout 300s -short -race $$(go list ./... | grep -v examples)
 .PHONY: test-race
 
 ## Execute integrated tests
 test-integration:
-	@go test -v -count=1 -timeout 600s ./...
+	@go test -v -count=1 -timeout 600s $$(go list ./... | grep -v examples)
 .PHONY: test-integration
 
 ## Output coverage of testing
 cov:
-	@go test -count 1 -coverprofile=cover.out ./...
+	@go test -count 1 -coverprofile=cover.out $$(go list ./... | grep -v examples)
 	@go tool cover -html=cover.out
 .PHONY: cov
 
