@@ -9,6 +9,8 @@ import (
 
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/pkg/errors"
+	"net/url"
+	"strings"
 )
 
 func TestGetReverseDNSs(t *testing.T) {
@@ -375,3 +377,113 @@ func TestDeleteReverseDNS_Failed(t *testing.T) {
 		t.Fatal("expected an error but got none")
 	}
 }
+
+// NewRequest Error Tests
+func TestGetReverseDNSs_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	input := &InputGetReverseDNSs{
+		Limit: 50,
+	}
+	_, err := client.GetReverseDNSs(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetReverseDNS_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	_, err := client.GetReverseDNS(context.TODO(), 12345)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestCreateReverseDNS_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	input := &InputCreateReverseDNS{
+		IP:        "192.168.1.1",
+		Subdomain: "mail",
+		Domain:    "example.com",
+	}
+	_, err := client.CreateReverseDNS(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestValidateReverseDNS_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	_, err := client.ValidateReverseDNS(context.TODO(), 12345)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteReverseDNS_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	err := client.DeleteReverseDNS(context.TODO(), 12345)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+

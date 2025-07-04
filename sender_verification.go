@@ -35,10 +35,7 @@ type OutputGetVerifiedSenders struct {
 }
 
 func (c *Client) GetVerifiedSenders(ctx context.Context, input *InputGetVerifiedSenders) ([]*VerifiedSender, error) {
-	u, err := url.Parse("/verified_senders")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/verified_senders")
 	q := u.Query()
 	if input.Limit > 0 {
 		q.Set("limit", strconv.Itoa(input.Limit))

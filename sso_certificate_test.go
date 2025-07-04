@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kylelemons/godebug/pretty"
@@ -249,4 +251,108 @@ func TestDeleteSSOCertificate_Failed(t *testing.T) {
 	if err == nil {
 		t.Error("expected an error")
 	}
+}
+
+// NewRequest Error Tests
+func TestGetSSOCertificate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSSOCertificate(context.TODO(), 12345)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSSOCertificates_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSSOCertificates(context.TODO(), "test-integration-id")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestCreateSSOCertificate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputCreateSSOCertificate{
+		PublicCertificate: "-----BEGIN CERTIFICATE-----\ntest certificate\n-----END CERTIFICATE-----",
+		IntegrationID:     "test-integration-id",
+	}
+	_, err := client.CreateSSOCertificate(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestUpdateSSOCertificate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputUpdateSSOCertificate{
+		PublicCertificate: "-----BEGIN CERTIFICATE-----\nupdated certificate\n-----END CERTIFICATE-----",
+		IntegrationID:     "updated-integration-id",
+	}
+	_, err := client.UpdateSSOCertificate(context.TODO(), 12345, input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteSSOCertificate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteSSOCertificate(context.TODO(), 12345)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }

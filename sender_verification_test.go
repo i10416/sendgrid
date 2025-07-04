@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kylelemons/godebug/pretty"
@@ -90,6 +92,25 @@ func TestGetVerifiedSenders_Failed(t *testing.T) {
 	}
 }
 
+func TestGetVerifiedSenders_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetVerifiedSenders(context.TODO(), &InputGetVerifiedSenders{})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestCreateVerifiedSenderRequest(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -168,6 +189,25 @@ func TestCreateVerifiedSenderRequest_Failed(t *testing.T) {
 	}
 }
 
+func TestCreateVerifiedSenderRequest_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.CreateVerifiedSenderRequest(context.TODO(), &InputCreateVerifiedSenderRequest{})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestResendVerifiedSenderRequest(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -194,6 +234,25 @@ func TestResendVerifiedSenderRequest_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestResendVerifiedSenderRequest_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.ResendVerifiedSenderRequest(context.TODO(), 12345678)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestVerifySenderRequest(t *testing.T) {
@@ -223,6 +282,25 @@ func TestVerifySenderRequest_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestVerifySenderRequest_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.VerifySenderRequest(context.TODO(), "abcdefghijklmn")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestUpdateVerifiedSender(t *testing.T) {
@@ -303,6 +381,25 @@ func TestUpdateVerifiedSender_Failed(t *testing.T) {
 	}
 }
 
+func TestUpdateVerifiedSender_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.UpdateVerifiedSender(context.TODO(), 12345678, &InputUpdateVerifiedSender{})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestDeleteVerifiedSender(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -330,6 +427,25 @@ func TestDeleteVerifiedSender_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestDeleteVerifiedSender_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteVerifiedSender(context.TODO(), 12345678)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestCompletedStepsVerifiedSender(t *testing.T) {
@@ -375,6 +491,25 @@ func TestCompletedStepsVerifiedSender_Failed(t *testing.T) {
 	}
 }
 
+func TestCompletedStepsVerifiedSender_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.CompletedStepsVerifiedSender(context.TODO())
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestGetSenderVerificationDomainWarnList(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -416,4 +551,23 @@ func TestGetSenderVerificationDomainWarnList_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestGetSenderVerificationDomainWarnList_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSenderVerificationDomainWarnList(context.TODO())
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }

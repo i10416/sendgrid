@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kylelemons/godebug/pretty"
@@ -307,4 +309,118 @@ func TestDeleteSSOIntegration_Failed(t *testing.T) {
 		t.Error("Expected an error but got nil")
 		return
 	}
+}
+
+// NewRequest Error Tests
+func TestGetSSOIntegration_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSSOIntegration(context.TODO(), "test-id")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSSOIntegrations_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputGetSSOIntegrations{
+		Si: true,
+	}
+	_, err := client.GetSSOIntegrations(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestCreateSSOIntegration_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputCreateSSOIntegration{
+		Name:                "test-integration",
+		Enabled:             true,
+		SigninURL:           "https://example.com/signin",
+		SignoutURL:          "https://example.com/signout",
+		EntityID:            "test-entity",
+		CompletedIntegration: false,
+	}
+	_, err := client.CreateSSOIntegration(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestUpdateSSOIntegration_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputUpdateSSOIntegration{
+		Name:       "updated-integration",
+		Enabled:    true,
+		SigninURL:  "https://example.com/signin-updated",
+		SignoutURL: "https://example.com/signout-updated",
+		EntityID:   "updated-entity",
+	}
+	_, err := client.UpdateSSOIntegration(context.TODO(), "test-id", input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteSSOIntegration_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteSSOIntegration(context.TODO(), "test-id")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }

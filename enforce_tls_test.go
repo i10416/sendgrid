@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kylelemons/godebug/pretty"
@@ -107,4 +109,48 @@ func TestUpdateEnforceTLS_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+// NewRequest Error Tests for Enforce TLS methods
+func TestGetEnforceTLS_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetEnforceTLS(context.TODO())
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestUpdateEnforceTLS_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputUpdateEnforceTLS{
+		RequireTLS:       true,
+		RequireValidCert: true,
+		Version:          1.2,
+	}
+	_, err := client.UpdateEnforceTLS(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }

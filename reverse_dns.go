@@ -40,10 +40,7 @@ type ARecord struct {
 
 // see: https://docs.sendgrid.com/api-reference/reverse-dns/retrieve-all-reverse-dns-records
 func (c *Client) GetReverseDNSs(ctx context.Context, input *InputGetReverseDNSs) ([]*OutputGetReverseDNS, error) {
-	u, err := url.Parse("/whitelabel/ips")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/whitelabel/ips")
 
 	q := u.Query()
 	if input.Limit > 0 {

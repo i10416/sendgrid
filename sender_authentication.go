@@ -51,10 +51,7 @@ type InputGetAuthenticatedDomains struct {
 }
 
 func (c *Client) GetAuthenticatedDomains(ctx context.Context, input *InputGetAuthenticatedDomains) ([]*DomainAuthentication, error) {
-	u, err := url.Parse("/whitelabel/domains")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/whitelabel/domains")
 
 	q := u.Query()
 	if input.Limit > 0 {
@@ -109,10 +106,7 @@ type OutputGetDefaultAuthentication struct {
 }
 
 func (c *Client) GetDefaultAuthentication(ctx context.Context, input *InputGetDefaultAuthentication) (*OutputGetDefaultAuthentication, error) {
-	u, err := url.Parse("/whitelabel/domains/default")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/whitelabel/domains/default")
 
 	q := u.Query()
 	if input.Domain != "" {

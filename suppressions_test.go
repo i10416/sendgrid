@@ -3,6 +3,7 @@ package sendgrid
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -847,4 +848,249 @@ func TestGetInvalidEmails_WithOptions(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Len(t, invalidEmails, 0)
+}
+
+// NewRequest Error Tests
+func TestGetBounces_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetBounces(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetBounce_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetBounce(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteBounces_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputDeleteSuppressions{DeleteAll: true}
+	err := client.DeleteBounces(context.TODO(), input)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteBounce_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteBounce(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetBlocks_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetBlocks(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetBlock_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetBlock(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteBlocks_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputDeleteSuppressions{DeleteAll: true}
+	err := client.DeleteBlocks(context.TODO(), input)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteBlock_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteBlock(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSpamReports_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSpamReports(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSpamReport_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSpamReport(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteSpamReports_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputDeleteSuppressions{DeleteAll: true}
+	err := client.DeleteSpamReports(context.TODO(), input)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteSpamReport_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteSpamReport(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetInvalidEmails_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetInvalidEmails(context.TODO(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetInvalidEmail_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetInvalidEmail(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteInvalidEmails_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputDeleteSuppressions{DeleteAll: true}
+	err := client.DeleteInvalidEmails(context.TODO(), input)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteInvalidEmail_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteInvalidEmail(context.TODO(), "test@example.com")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
 }

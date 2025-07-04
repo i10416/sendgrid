@@ -3,6 +3,7 @@ package sendgrid
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -763,5 +764,231 @@ func TestGetIPWarmupStatus_URLEscape(t *testing.T) {
 	assert.NotNil(t, status)
 	assert.Equal(t, "192.168.1.1/24", status.IP)
 	assert.True(t, status.Warmup)
+}
+
+// NewRequest Error Tests for IP Address methods
+func TestGetIPAddresses_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetIPAddresses(context.TODO())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetAssignedIPAddresses_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetAssignedIPAddresses(context.TODO())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetRemainingIPCount_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetRemainingIPCount(context.TODO())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetIPAddress_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetIPAddress(context.TODO(), "192.168.1.1")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetIPPools_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetIPPools(context.TODO())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestCreateIPPool_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.CreateIPPool(context.TODO(), "test-pool")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetIPPool_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetIPPool(context.TODO(), "test-pool")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestUpdateIPPool_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.UpdateIPPool(context.TODO(), "old-pool", "new-pool")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteIPPool_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteIPPool(context.TODO(), "test-pool")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestAddIPToPool_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.AddIPToPool(context.TODO(), "test-pool", "192.168.1.1")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestRemoveIPFromPool_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.RemoveIPFromPool(context.TODO(), "test-pool", "192.168.1.1")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestStartIPWarmup_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.StartIPWarmup(context.TODO(), "192.168.1.1")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestStopIPWarmup_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.StopIPWarmup(context.TODO(), "192.168.1.1")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetIPWarmupStatus_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetIPWarmupStatus(context.TODO(), "192.168.1.1")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetAllIPWarmupStatus_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetAllIPWarmupStatus(context.TODO())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
 }
 
