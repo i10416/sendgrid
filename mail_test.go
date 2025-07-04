@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -418,4 +419,29 @@ func TestSendMail_WithMultipleRecipients(t *testing.T) {
 	result, err := client.SendMail(context.TODO(), mail)
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
+}
+
+func TestSendMail_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	mail := NewInputSendMail()
+	mail.SetFrom(NewEmail("invalid-email", "From User"))
+	mail.SetSubject("Test Email")
+
+	p := NewPersonalization()
+	p.AddTo(NewEmail("to@example.com", "To User"))
+	mail.AddPersonalization(p)
+
+	mail.AddContent(NewContent("text/plain", "Hello, World!"))
+
+	_, err := client.SendMail(context.TODO(), mail)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "trailing slash")
+
+	client.baseURL = originalBaseURL
 }

@@ -411,3 +411,100 @@ func TestNewRequestWithoutBody(t *testing.T) {
 		t.Errorf("Expected Content-Type header to be empty, got %v", req.Header.Get("Content-Type"))
 	}
 }
+
+func TestNewRequestWithBody(t *testing.T) {
+	client := New("test-api-key")
+	
+	body := map[string]string{
+		"name": "test",
+		"email": "test@example.com",
+	}
+	
+	req, err := client.NewRequest("POST", "/test", body)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	
+	// Check that Content-Type header is set when body is provided
+	if req.Header.Get("Content-Type") != "application/json" {
+		t.Errorf("Expected Content-Type header to be 'application/json', got %v", req.Header.Get("Content-Type"))
+	}
+	
+	// Check Authorization header
+	expectedAuth := "Bearer test-api-key"
+	if req.Header.Get("Authorization") != expectedAuth {
+		t.Errorf("Expected Authorization header to be '%s', got %v", expectedAuth, req.Header.Get("Authorization"))
+	}
+}
+
+func TestNewRequestWithSubuser(t *testing.T) {
+	client := New("test-api-key", OptionSubuser("test-subuser"))
+	
+	req, err := client.NewRequest("GET", "/test", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	
+	// Check On-Behalf-Of header is set
+	if req.Header.Get("On-Behalf-Of") != "test-subuser" {
+		t.Errorf("Expected On-Behalf-Of header to be 'test-subuser', got %v", req.Header.Get("On-Behalf-Of"))
+	}
+}
+
+func TestNewRequestWithoutSubuser(t *testing.T) {
+	client := New("test-api-key")
+	
+	req, err := client.NewRequest("GET", "/test", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	
+	// Check On-Behalf-Of header is not set
+	if req.Header.Get("On-Behalf-Of") != "" {
+		t.Errorf("Expected On-Behalf-Of header to be empty, got %v", req.Header.Get("On-Behalf-Of"))
+	}
+}
+
+func TestNewRequestURLConstruction(t *testing.T) {
+	client := New("test-api-key")
+	
+	tests := []struct {
+		name     string
+		urlStr   string
+		expected string
+	}{
+		{
+			name:     "root path",
+			urlStr:   "/",
+			expected: "https://api.sendgrid.com/v3/",
+		},
+		{
+			name:     "simple path",
+			urlStr:   "/test",
+			expected: "https://api.sendgrid.com/v3/test",
+		},
+		{
+			name:     "nested path",
+			urlStr:   "/test/nested/path",
+			expected: "https://api.sendgrid.com/v3/test/nested/path",
+		},
+		{
+			name:     "path with query parameters",
+			urlStr:   "/test?param=value",
+			expected: "https://api.sendgrid.com/v3/test?param=value",
+		},
+	}
+	
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := client.NewRequest("GET", tt.urlStr, nil)
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+			
+			if req.URL.String() != tt.expected {
+				t.Errorf("Expected URL to be '%s', got %s", tt.expected, req.URL.String())
+			}
+		})
+	}
+}
