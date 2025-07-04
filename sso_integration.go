@@ -56,10 +56,7 @@ type SSOIntegration struct {
 
 // see: https://docs.sendgrid.com/api-reference/single-sign-on-settings/get-all-sso-integrations
 func (c *Client) GetSSOIntegrations(ctx context.Context, input *InputGetSSOIntegrations) ([]*SSOIntegration, error) {
-	u, err := url.Parse("/sso/integrations")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/sso/integrations")
 
 	q := u.Query()
 	if input.Si {

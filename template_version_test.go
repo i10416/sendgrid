@@ -285,3 +285,49 @@ func TestDeleteTemplateVersion_Failed(t *testing.T) {
 		t.Fatal("expected an error but got none")
 	}
 }
+
+// NewRequest Error Tests
+func TestGetTemplateVersion_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url")) // Invalid URL to cause NewRequest error
+
+	_, err := client.GetTemplateVersion(context.TODO(), "templateID", "versionID")
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestCreateTemplateVersion_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.CreateTemplateVersion(context.TODO(), "templateID", &InputCreateTemplateVersion{})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestUpdateTemplateVersion_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL(":://invalid-url"))
+
+	_, err := client.UpdateTemplateVersion(context.TODO(), "templateID", "versionID", &InputUpdateTemplateVersion{})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestActivateTemplateVersion_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL(":://invalid-url"))
+
+	_, err := client.ActivateTemplateVersion(context.TODO(), "templateID", "versionID")
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestDeleteTemplateVersion_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL(":://invalid-url"))
+
+	err := client.DeleteTemplateVersion(context.TODO(), "templateID", "versionID")
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}

@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kylelemons/godebug/pretty"
@@ -79,6 +81,25 @@ func TestGetTeammate_Failed(t *testing.T) {
 	}
 }
 
+func TestGetTeammate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetTeammate(context.TODO(), "username")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestGetTeammates(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -148,6 +169,25 @@ func TestGetTeammates_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestGetTeammates_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetTeammates(context.TODO(), nil)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestGetTeammatesWithPagination(t *testing.T) {
@@ -259,6 +299,25 @@ func TestGetPendingTeammates_Failed(t *testing.T) {
 	}
 }
 
+func TestGetPendingTeammates_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetPendingTeammates(context.TODO())
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestInviteTeammate(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -324,6 +383,32 @@ func TestInviteTeammate_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestInviteTeammate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.InviteTeammate(context.TODO(), &InputInviteTeammate{
+		Email:   "dummy@example.com",
+		IsAdmin: false,
+		Scopes: []string{
+			"user.profile.read",
+			"user.profile.update",
+		},
+	})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestUpdateTeammatePermissions(t *testing.T) {
@@ -411,6 +496,30 @@ func TestUpdateTeammatePermissions_Failed(t *testing.T) {
 	}
 }
 
+func TestUpdateTeammatePermissions_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.UpdateTeammatePermissions(context.TODO(), "dummy", &InputUpdateTeammatePermissions{
+		IsAdmin: false,
+		Scopes: []string{
+			"user.profile.read",
+		},
+	})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestDeleteTeammate(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -440,6 +549,25 @@ func TestDeleteTeammate_Failed(t *testing.T) {
 	}
 }
 
+func TestDeleteTeammate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeleteTeammate(context.TODO(), "dummy")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestDeletePendingTeammate(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -467,6 +595,25 @@ func TestDeletePendingTeammate_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestDeletePendingTeammate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	err := client.DeletePendingTeammate(context.TODO(), "dummy")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestGetTeammateSubuserAccess(t *testing.T) {
@@ -536,6 +683,25 @@ func TestGetTeammateSubuserAccess_Failed(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error but got none")
 	}
+}
+
+func TestGetTeammateSubuserAccess_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetTeammateSubuserAccess(context.TODO(), "dummy", &InputGetTeammateSubuserAccess{})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
 }
 
 func TestCreateSSOTeammate(t *testing.T) {
@@ -612,6 +778,33 @@ func TestCreateSSOTeammate_Failed(t *testing.T) {
 	}
 }
 
+func TestCreateSSOTeammate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.CreateSSOTeammate(context.TODO(), &InputCreateSSOTeammate{
+		Email:     "dummy@example.com",
+		FirstName: "dummy_first_name",
+		LastName:  "dummy_last_name",
+		Scopes: []string{
+			"user.profile.read",
+			"user.profile.update",
+		},
+	})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
 func TestUpdateSSOTeammate(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()
@@ -682,5 +875,46 @@ func TestUpdateSSOTeammate_Failed(t *testing.T) {
 	})
 	if err == nil {
 		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestUpdateSSOTeammate_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.UpdateSSOTeammate(context.TODO(), "dummy", &InputUpdateSSOTeammate{
+		FirstName: "dummy_first_name",
+		LastName:  "dummy_last_name",
+		IsAdmin:   false,
+		Scopes: []string{
+			"user.profile.read",
+			"user.profile.update",
+		},
+	})
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetTeammateSubuserAccessWithInvalidTeammateName(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	// Test with teammate name containing invalid URL characters
+	invalidName := string([]byte{0x00, 0x01, 0x02})
+	input := &InputGetTeammateSubuserAccess{}
+	
+	_, err := client.GetTeammateSubuserAccess(context.TODO(), invalidName, input)
+	if err == nil {
+		t.Error("Expected error for invalid teammate name in URL")
 	}
 }

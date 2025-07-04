@@ -80,10 +80,7 @@ type BrandedLink struct {
 }
 
 func (c *Client) GetBrandedLinks(ctx context.Context, input *InputGetBrandedLinks) ([]*BrandedLink, error) {
-	u, err := url.Parse("/whitelabel/links")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/whitelabel/links")
 
 	q := u.Query()
 	if input.Limit > 0 {

@@ -9,6 +9,8 @@ import (
 
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/pkg/errors"
+	"net/url"
+	"strings"
 )
 
 func TestGetInboundParseWebhooks(t *testing.T) {
@@ -251,3 +253,113 @@ func TestDeleteInboundParseWebhook_Failed(t *testing.T) {
 		t.Fatal("expected an error but got nil")
 	}
 }
+
+// NewRequest Error Tests
+func TestGetInboundParseWebhooks_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	_, err := client.GetInboundParseWebhooks(context.TODO())
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetInboundParseWebhook_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	_, err := client.GetInboundParseWebhook(context.TODO(), "mail.example.com")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestCreateInboundParseWebhook_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	input := &InputCreateInboundParseWebhook{
+		Hostname: "mail.example.com",
+		URL:      "https://example.com/parse",
+	}
+	_, err := client.CreateInboundParseWebhook(context.TODO(), input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestUpdateInboundParseWebhook_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	input := &InputUpdateInboundParseWebhook{
+		URL:      "https://example.com/updated-parse",
+		SpamCheck: true,
+	}
+	_, err := client.UpdateInboundParseWebhook(context.TODO(), "mail.example.com", input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestDeleteInboundParseWebhook_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	// Call method with appropriate parameters
+	err := client.DeleteInboundParseWebhook(context.TODO(), "mail.example.com")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+

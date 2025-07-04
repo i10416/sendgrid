@@ -126,6 +126,10 @@ func String(v string) *string { return &v }
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	if c.baseURL == nil {
+		return nil, fmt.Errorf("baseURL is nil")
+	}
+
 	if strings.HasSuffix(c.baseURL.Path, "/") {
 		return nil, fmt.Errorf("baseURL must not have a trailing slash, but %q does", c.baseURL)
 	}

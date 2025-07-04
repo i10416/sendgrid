@@ -148,6 +148,21 @@ func TestNewRequestWithTrailingSlashError(t *testing.T) {
 	}
 }
 
+func TestNewRequestWithNilBaseURL(t *testing.T) {
+	client := New("test-api-key")
+	client.baseURL = nil // Manually set baseURL to nil
+
+	_, err := client.NewRequest("GET", "/test", nil)
+	if err == nil {
+		t.Error("Expected error for nil baseURL")
+	}
+	if err != nil && err.Error() != "baseURL is nil" {
+		t.Errorf("Expected error 'baseURL is nil', got %v", err)
+	}
+}
+
+
+
 func TestAddOptions(t *testing.T) {
 	client := New("test-api-key")
 
@@ -194,6 +209,42 @@ func TestAddOptionsWithInvalidURL(t *testing.T) {
 	_, err := client.AddOptions("://invalid-url", opts)
 	if err == nil {
 		t.Error("Expected error for invalid URL")
+	}
+}
+
+func TestAddOptionsWithMalformedURL(t *testing.T) {
+	client := New("test-api-key")
+
+	opts := struct{}{}
+	// Test with URL containing invalid characters that url.Parse will reject
+	invalidURL := string([]byte{0x00, 0x01, 0x02})
+	_, err := client.AddOptions(invalidURL, opts)
+	if err == nil {
+		t.Error("Expected error for malformed URL")
+	}
+}
+
+func TestOptionBaseURLWithInvalidURL(t *testing.T) {
+	// Test OptionBaseURL with invalid URL that url.Parse can handle
+	// Note: url.Parse in OptionBaseURL ignores errors with _ assignment
+	// but we can test that it doesn't panic with invalid input
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("OptionBaseURL panicked with invalid URL: %v", r)
+		}
+	}()
+	
+	invalidURL := "://invalid-url"
+	option := OptionBaseURL(invalidURL)
+	client := New("test-api-key")
+	originalBaseURL := client.baseURL
+	option(client)
+	
+	// The client should still have a baseURL (may be nil for invalid URLs)
+	// This test ensures no panic occurs with invalid URLs
+	if client.baseURL != originalBaseURL {
+		// URL was processed (could be nil or different value)
+		t.Logf("BaseURL changed from %v to %v with invalid URL", originalBaseURL, client.baseURL)
 	}
 }
 
@@ -313,5 +364,50 @@ func TestDoWithCancelledContext(t *testing.T) {
 
 	if err != context.Canceled {
 		t.Errorf("Expected context.Canceled error, got %v", err)
+	}
+}
+
+func TestNewRequestWithInvalidURL(t *testing.T) {
+	client := New("test-api-key")
+	
+	// Use a URL string with invalid characters that will cause baseURL.Parse to fail
+	_, err := client.NewRequest("GET", string([]byte{0x00, 0x01, 0x02}), nil)
+	if err == nil {
+		t.Error("Expected error for invalid URL")
+	}
+}
+
+func TestNewRequestWithJSONEncodeError(t *testing.T) {
+	client := New("test-api-key")
+	
+	// Use a body that cannot be JSON encoded (channel type)
+	invalidBody := make(chan int)
+	_, err := client.NewRequest("POST", "/test", invalidBody)
+	if err == nil {
+		t.Error("Expected error for invalid JSON body")
+	}
+}
+
+func TestNewRequestWithInvalidHTTPMethod(t *testing.T) {
+	client := New("test-api-key")
+	
+	// Use an invalid HTTP method that will cause http.NewRequest to fail
+	_, err := client.NewRequest("INVALID\nMETHOD", "/test", nil)
+	if err == nil {
+		t.Error("Expected error for invalid HTTP method")
+	}
+}
+
+func TestNewRequestWithoutBody(t *testing.T) {
+	client := New("test-api-key")
+	
+	req, err := client.NewRequest("GET", "/test", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	
+	// Check that Content-Type header is not set when body is nil
+	if req.Header.Get("Content-Type") != "" {
+		t.Errorf("Expected Content-Type header to be empty, got %v", req.Header.Get("Content-Type"))
 	}
 }

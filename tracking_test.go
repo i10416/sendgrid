@@ -490,3 +490,85 @@ func TestUpdateSubscriptionTrackingSettings_Failed(t *testing.T) {
 		t.Fatal("expected an error but got none")
 	}
 }
+
+// NewRequest Error Tests
+func TestGetTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url")) // Invalid URL to cause NewRequest error
+
+	_, err := client.GetTrackingSettings(context.TODO())
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestGetClickTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.GetClickTrackingSettings(context.TODO())
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestUpdateClickTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.UpdateClickTrackingSettings(context.TODO(), &InputUpdateClickTrackingSettings{Enabled: true})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestGetOpenTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.GetOpenTrackingSettings(context.TODO())
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestUpdateOpenTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.UpdateOpenTrackingSettings(context.TODO(), &InputUpdateOpenTrackingSettings{Enabled: true})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestGetGoogleAnalyticsSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.GetGoogleAnalyticsSettings(context.TODO())
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestUpdateGoogleAnalyticsSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.UpdateGoogleAnalyticsSettings(context.TODO(), &InputUpdateGoogleAnalyticsSettings{Enabled: true})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestGetSubscriptionTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.GetSubscriptionTrackingSettings(context.TODO())
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}
+
+func TestUpdateSubscriptionTrackingSettings_NewRequestError(t *testing.T) {
+	client := New("test-api-key", OptionBaseURL("://invalid-url"))
+
+	_, err := client.UpdateSubscriptionTrackingSettings(context.TODO(), &InputUpdateSubscriptionTrackingSettings{Enabled: true})
+	if err == nil {
+		t.Fatal("expected an error but got none")
+	}
+}

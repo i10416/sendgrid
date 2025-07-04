@@ -77,10 +77,7 @@ type OutputGetTeammates struct {
 }
 
 func (c *Client) GetTeammates(ctx context.Context, input *InputGetTeammates) (*OutputGetTeammates, error) {
-	u, err := url.Parse("/teammates")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/teammates")
 
 	if input != nil {
 		q := u.Query()

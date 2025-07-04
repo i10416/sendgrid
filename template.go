@@ -78,10 +78,7 @@ type Metadata struct {
 
 // see: https://docs.sendgrid.com/api-reference/transactional-templates/retrieve-paged-transactional-templates
 func (c *Client) GetTemplates(ctx context.Context, input *InputGetTemplates) (*OutputGetTemplates, error) {
-	u, err := url.Parse("/templates")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/templates")
 
 	q := u.Query()
 	if input.Generations != "" {

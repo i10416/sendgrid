@@ -21,10 +21,7 @@ type InputGetSubusers struct {
 }
 
 func (c *Client) GetSubusers(ctx context.Context, input *InputGetSubusers) ([]*Subuser, error) {
-	u, err := url.Parse("/subusers")
-	if err != nil {
-		return nil, err
-	}
+	u, _ := url.Parse("/subusers")
 
 	q := u.Query()
 	if input.Username != "" {
