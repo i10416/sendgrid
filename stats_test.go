@@ -797,7 +797,7 @@ func TestStatsAddOptionsErrorCoverage(t *testing.T) {
 		StartDate: "2025-01-01",
 		EndDate:   "2025-01-31",
 	}
-	
+
 	// Test AddOptions with various invalid paths to ensure coverage
 	tests := []struct {
 		name    string
@@ -812,7 +812,7 @@ func TestStatsAddOptionsErrorCoverage(t *testing.T) {
 			wantErr: "missing protocol scheme",
 		},
 		{
-			name:    "invalid_path_category_sums", 
+			name:    "invalid_path_category_sums",
 			path:    "://invalid-scheme-categories",
 			opts:    invalidOpts,
 			wantErr: "missing protocol scheme",
@@ -837,7 +837,7 @@ func TestStatsAddOptionsErrorCoverage(t *testing.T) {
 		},
 		{
 			name:    "invalid_path_subuser_stats",
-			path:    "://invalid-scheme-subuser-stats", 
+			path:    "://invalid-scheme-subuser-stats",
 			opts:    invalidOpts,
 			wantErr: "missing protocol scheme",
 		},
@@ -852,4 +852,3 @@ func TestStatsAddOptionsErrorCoverage(t *testing.T) {
 		})
 	}
 }
-

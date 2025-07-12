@@ -214,3 +214,48 @@ func (c *Client) DeleteEventWebhook(ctx context.Context, id string) error {
 
 	return nil
 }
+
+type InputToggleSignatureVerification struct {
+	Enabled bool `json:"enabled"`
+}
+
+type OutputToggleSignatureVerification struct {
+	ID        string `json:"id,omitempty"`
+	PublicKey string `json:"public_key,omitempty"`
+}
+
+// see: https://docs.sendgrid.com/api-reference/webhooks/toggle-signature-verification-for-an-event-webhook
+func (c *Client) ToggleSignatureVerification(ctx context.Context, id string, input *InputToggleSignatureVerification) (*OutputToggleSignatureVerification, error) {
+	path := fmt.Sprintf("/user/webhooks/event/settings/signed/%s", id)
+	req, err := c.NewRequest("PATCH", path, input)
+	if err != nil {
+		return nil, err
+	}
+
+	r := new(OutputToggleSignatureVerification)
+	if err := c.Do(ctx, req, &r); err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+type OutputGetSignedEventWebhooksPublicKey struct {
+	PublicKey string `json:"public_key,omitempty"`
+}
+
+// see: https://docs.sendgrid.com/api-reference/webhooks/get-signed-event-webhooks-public-key
+func (c *Client) GetSignedEventWebhooksPublicKey(ctx context.Context, id string) (*OutputGetSignedEventWebhooksPublicKey, error) {
+	path := fmt.Sprintf("/user/webhooks/event/settings/signed/%s", id)
+	req, err := c.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := new(OutputGetSignedEventWebhooksPublicKey)
+	if err := c.Do(ctx, req, &r); err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}

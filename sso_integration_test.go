@@ -362,11 +362,11 @@ func TestCreateSSOIntegration_NewRequestError(t *testing.T) {
 	client.baseURL = invalidURL
 
 	input := &InputCreateSSOIntegration{
-		Name:                "test-integration",
-		Enabled:             true,
-		SigninURL:           "https://example.com/signin",
-		SignoutURL:          "https://example.com/signout",
-		EntityID:            "test-entity",
+		Name:                 "test-integration",
+		Enabled:              true,
+		SigninURL:            "https://example.com/signin",
+		SignoutURL:           "https://example.com/signout",
+		EntityID:             "test-entity",
 		CompletedIntegration: false,
 	}
 	_, err := client.CreateSSOIntegration(context.TODO(), input)

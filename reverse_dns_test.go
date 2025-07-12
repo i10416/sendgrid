@@ -486,4 +486,3 @@ func TestDeleteReverseDNS_NewRequestError(t *testing.T) {
 
 	client.baseURL = originalBaseURL
 }
-

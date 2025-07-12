@@ -474,3 +474,135 @@ func TestDeleteEventWebhook_NewRequestError(t *testing.T) {
 	client.baseURL = originalBaseURL
 }
 
+func TestToggleSignatureVerification(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/user/webhooks/event/settings/signed/172af0f9-f165-4172-8a8c-25c16e8e8e25", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PATCH" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		if _, err := fmt.Fprint(w, `{
+			"id": "172af0f9-f165-4172-8a8c-25c16e8e8e25",
+			"public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA123456\n-----END PUBLIC KEY-----"
+		}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	input := &InputToggleSignatureVerification{
+		Enabled: true,
+	}
+	expected, err := client.ToggleSignatureVerification(context.TODO(), "172af0f9-f165-4172-8a8c-25c16e8e8e25", input)
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+
+	want := &OutputToggleSignatureVerification{
+		ID:        "172af0f9-f165-4172-8a8c-25c16e8e8e25",
+		PublicKey: "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA123456\n-----END PUBLIC KEY-----",
+	}
+
+	if !reflect.DeepEqual(want, expected) {
+		t.Fatal(ErrIncorrectResponse, errors.New(pretty.Compare(want, expected)))
+	}
+}
+
+func TestToggleSignatureVerification_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/user/webhooks/event/settings/signed/172af0f9-f165-4172-8a8c-25c16e8e8e25", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	input := &InputToggleSignatureVerification{}
+	_, err := client.ToggleSignatureVerification(context.TODO(), "172af0f9-f165-4172-8a8c-25c16e8e8e25", input)
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+}
+
+func TestToggleSignatureVerification_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	input := &InputToggleSignatureVerification{
+		Enabled: true,
+	}
+	_, err := client.ToggleSignatureVerification(context.TODO(), "test-id", input)
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}
+
+func TestGetSignedEventWebhooksPublicKey(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/user/webhooks/event/settings/signed/172af0f9-f165-4172-8a8c-25c16e8e8e25", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := fmt.Fprint(w, `{
+			"public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA123456\n-----END PUBLIC KEY-----"
+		}`); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	expected, err := client.GetSignedEventWebhooksPublicKey(context.TODO(), "172af0f9-f165-4172-8a8c-25c16e8e8e25")
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+
+	want := &OutputGetSignedEventWebhooksPublicKey{
+		PublicKey: "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA123456\n-----END PUBLIC KEY-----",
+	}
+
+	if !reflect.DeepEqual(want, expected) {
+		t.Fatal(ErrIncorrectResponse, errors.New(pretty.Compare(want, expected)))
+	}
+}
+
+func TestGetSignedEventWebhooksPublicKey_Failed(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/user/webhooks/event/settings/signed/172af0f9-f165-4172-8a8c-25c16e8e8e25", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	_, err := client.GetSignedEventWebhooksPublicKey(context.TODO(), "172af0f9-f165-4172-8a8c-25c16e8e8e25")
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+}
+
+func TestGetSignedEventWebhooksPublicKey_NewRequestError(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	originalBaseURL := client.baseURL
+	invalidURL, _ := url.Parse("https://api.example.com/v3/")
+	client.baseURL = invalidURL
+
+	_, err := client.GetSignedEventWebhooksPublicKey(context.TODO(), "test-id")
+	if err == nil {
+		t.Error("Expected error for invalid baseURL")
+	}
+	if err != nil && !strings.Contains(err.Error(), "trailing slash") {
+		t.Errorf("Expected error message to contain 'trailing slash', got %v", err.Error())
+	}
+
+	client.baseURL = originalBaseURL
+}

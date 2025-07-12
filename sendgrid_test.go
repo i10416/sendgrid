@@ -161,8 +161,6 @@ func TestNewRequestWithNilBaseURL(t *testing.T) {
 	}
 }
 
-
-
 func TestAddOptions(t *testing.T) {
 	client := New("test-api-key")
 
@@ -233,13 +231,13 @@ func TestOptionBaseURLWithInvalidURL(t *testing.T) {
 			t.Errorf("OptionBaseURL panicked with invalid URL: %v", r)
 		}
 	}()
-	
+
 	invalidURL := "://invalid-url"
 	option := OptionBaseURL(invalidURL)
 	client := New("test-api-key")
 	originalBaseURL := client.baseURL
 	option(client)
-	
+
 	// The client should still have a baseURL (may be nil for invalid URLs)
 	// This test ensures no panic occurs with invalid URLs
 	if client.baseURL != originalBaseURL {
@@ -369,7 +367,7 @@ func TestDoWithCancelledContext(t *testing.T) {
 
 func TestNewRequestWithInvalidURL(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	// Use a URL string with invalid characters that will cause baseURL.Parse to fail
 	_, err := client.NewRequest("GET", string([]byte{0x00, 0x01, 0x02}), nil)
 	if err == nil {
@@ -379,7 +377,7 @@ func TestNewRequestWithInvalidURL(t *testing.T) {
 
 func TestNewRequestWithJSONEncodeError(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	// Use a body that cannot be JSON encoded (channel type)
 	invalidBody := make(chan int)
 	_, err := client.NewRequest("POST", "/test", invalidBody)
@@ -390,7 +388,7 @@ func TestNewRequestWithJSONEncodeError(t *testing.T) {
 
 func TestNewRequestWithInvalidHTTPMethod(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	// Use an invalid HTTP method that will cause http.NewRequest to fail
 	_, err := client.NewRequest("INVALID\nMETHOD", "/test", nil)
 	if err == nil {
@@ -400,12 +398,12 @@ func TestNewRequestWithInvalidHTTPMethod(t *testing.T) {
 
 func TestNewRequestWithoutBody(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	req, err := client.NewRequest("GET", "/test", nil)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
-	
+
 	// Check that Content-Type header is not set when body is nil
 	if req.Header.Get("Content-Type") != "" {
 		t.Errorf("Expected Content-Type header to be empty, got %v", req.Header.Get("Content-Type"))
@@ -414,22 +412,22 @@ func TestNewRequestWithoutBody(t *testing.T) {
 
 func TestNewRequestWithBody(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	body := map[string]string{
-		"name": "test",
+		"name":  "test",
 		"email": "test@example.com",
 	}
-	
+
 	req, err := client.NewRequest("POST", "/test", body)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
-	
+
 	// Check that Content-Type header is set when body is provided
 	if req.Header.Get("Content-Type") != "application/json" {
 		t.Errorf("Expected Content-Type header to be 'application/json', got %v", req.Header.Get("Content-Type"))
 	}
-	
+
 	// Check Authorization header
 	expectedAuth := "Bearer test-api-key"
 	if req.Header.Get("Authorization") != expectedAuth {
@@ -439,12 +437,12 @@ func TestNewRequestWithBody(t *testing.T) {
 
 func TestNewRequestWithSubuser(t *testing.T) {
 	client := New("test-api-key", OptionSubuser("test-subuser"))
-	
+
 	req, err := client.NewRequest("GET", "/test", nil)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
-	
+
 	// Check On-Behalf-Of header is set
 	if req.Header.Get("On-Behalf-Of") != "test-subuser" {
 		t.Errorf("Expected On-Behalf-Of header to be 'test-subuser', got %v", req.Header.Get("On-Behalf-Of"))
@@ -453,12 +451,12 @@ func TestNewRequestWithSubuser(t *testing.T) {
 
 func TestNewRequestWithoutSubuser(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	req, err := client.NewRequest("GET", "/test", nil)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
-	
+
 	// Check On-Behalf-Of header is not set
 	if req.Header.Get("On-Behalf-Of") != "" {
 		t.Errorf("Expected On-Behalf-Of header to be empty, got %v", req.Header.Get("On-Behalf-Of"))
@@ -467,7 +465,7 @@ func TestNewRequestWithoutSubuser(t *testing.T) {
 
 func TestNewRequestURLConstruction(t *testing.T) {
 	client := New("test-api-key")
-	
+
 	tests := []struct {
 		name     string
 		urlStr   string
@@ -494,14 +492,14 @@ func TestNewRequestURLConstruction(t *testing.T) {
 			expected: "https://api.sendgrid.com/v3/test?param=value",
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req, err := client.NewRequest("GET", tt.urlStr, nil)
 			if err != nil {
 				t.Fatalf("Failed to create request: %v", err)
 			}
-			
+
 			if req.URL.String() != tt.expected {
 				t.Errorf("Expected URL to be '%s', got %s", tt.expected, req.URL.String())
 			}

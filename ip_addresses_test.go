@@ -991,4 +991,3 @@ func TestGetAllIPWarmupStatus_NewRequestError(t *testing.T) {
 
 	client.baseURL = originalBaseURL
 }
-

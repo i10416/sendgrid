@@ -325,9 +325,9 @@ func TestCreateAlert_NewRequestError(t *testing.T) {
 	client.baseURL = invalidURL
 
 	input := &InputCreateAlert{
-		Type:      "usage_limit",
-		EmailTo:   "test@example.com",
-		Frequency: "daily",
+		Type:       "usage_limit",
+		EmailTo:    "test@example.com",
+		Frequency:  "daily",
 		Percentage: 90,
 	}
 	_, err := client.CreateAlert(context.TODO(), input)
@@ -382,4 +382,3 @@ func TestDeleteAlert_NewRequestError(t *testing.T) {
 
 	client.baseURL = originalBaseURL
 }
-
