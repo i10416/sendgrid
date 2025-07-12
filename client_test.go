@@ -14,6 +14,7 @@ func TestNew(t *testing.T) {
 	client := New("test-key")
 	if client == nil {
 		t.Fatal("expected client to be non-nil")
+		return
 	}
 	if client.apiKey != "test-key" {
 		t.Errorf("expected apiKey to be 'test-key', got %s", client.apiKey)
@@ -198,6 +199,7 @@ func TestBool(t *testing.T) {
 	b := Bool(true)
 	if b == nil {
 		t.Fatal("expected non-nil bool pointer")
+		return
 	}
 	if *b != true {
 		t.Error("expected bool value to be true")
@@ -208,6 +210,7 @@ func TestString(t *testing.T) {
 	s := String("test")
 	if s == nil {
 		t.Fatal("expected non-nil string pointer")
+		return
 	}
 	if *s != "test" {
 		t.Error("expected string value to be 'test'")

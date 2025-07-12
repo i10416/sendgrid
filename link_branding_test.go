@@ -843,4 +843,3 @@ func TestDeleteBrandedLink_NewRequestError(t *testing.T) {
 
 	client.baseURL = originalBaseURL
 }
-

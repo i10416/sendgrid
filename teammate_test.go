@@ -912,7 +912,7 @@ func TestGetTeammateSubuserAccessWithInvalidTeammateName(t *testing.T) {
 	// Test with teammate name containing invalid URL characters
 	invalidName := string([]byte{0x00, 0x01, 0x02})
 	input := &InputGetTeammateSubuserAccess{}
-	
+
 	_, err := client.GetTeammateSubuserAccess(context.TODO(), invalidName, input)
 	if err == nil {
 		t.Error("Expected error for invalid teammate name in URL")

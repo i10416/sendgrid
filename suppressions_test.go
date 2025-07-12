@@ -1178,11 +1178,11 @@ func TestSuppressionFunctions_CoverAddOptionsErrorPaths(t *testing.T) {
 
 	// Test with struct that has circular reference or complex nested structure
 	// that might cause reflection issues in query.Values
-	
+
 	type ComplexOptions struct {
-		StartTime int64                   `url:"start_time,omitempty"`
-		Nested    *ComplexOptions        `url:"-"` // this should be ignored due to "-" tag
-		BadField  func() string          `url:"bad_field,omitempty"`
+		StartTime int64           `url:"start_time,omitempty"`
+		Nested    *ComplexOptions `url:"-"` // this should be ignored due to "-" tag
+		BadField  func() string   `url:"bad_field,omitempty"`
 	}
 
 	complexOpts := &ComplexOptions{
@@ -1195,7 +1195,7 @@ func TestSuppressionFunctions_CoverAddOptionsErrorPaths(t *testing.T) {
 	_, err := client.AddOptions("/suppression/bounces", complexOpts)
 	// If it doesn't error, that means go-querystring handles it gracefully
 	// We need to accept that modern go-querystring is very robust
-	
+
 	if err != nil {
 		assert.Error(t, err)
 	} else {
@@ -1226,7 +1226,7 @@ func TestSuppressionFunctions_AddOptionsURLParseError(t *testing.T) {
 func TestGetBounces_AddOptionsErrorAtLine80(t *testing.T) {
 	client, _, _, teardown := setup()
 	defer teardown()
-	
+
 	// Test with valid SuppressionListOptions but simulate AddOptions error
 	// by using the same URL parsing error pattern that would occur at line 80
 	opts := &SuppressionListOptions{
@@ -1236,11 +1236,11 @@ func TestGetBounces_AddOptionsErrorAtLine80(t *testing.T) {
 		Offset:    0,
 		Email:     "test@example.com",
 	}
-	
+
 	// Test the specific path used by GetBounces function ("/suppression/bounces")
 	// This mimics the exact AddOptions call made at line 80: path, err = c.AddOptions(path, opts)
 	bouncesPath := "/suppression/bounces"
-	
+
 	// Test AddOptions with the same pattern as GetBounces
 	modifiedPath, err := client.AddOptions(bouncesPath, opts)
 	assert.NoError(t, err, "Valid AddOptions call should succeed")
@@ -1249,7 +1249,7 @@ func TestGetBounces_AddOptionsErrorAtLine80(t *testing.T) {
 	assert.Contains(t, modifiedPath, "limit=50")
 	assert.Contains(t, modifiedPath, "email=test%40example.com")
 	// Note: offset=0 is omitted by go-querystring as it's the default value
-	
+
 	// Test AddOptions error scenario using invalid path (simulates URL parsing error)
 	invalidPath := "://invalid-scheme"
 	_, err = client.AddOptions(invalidPath, opts)
@@ -1261,7 +1261,7 @@ func TestGetBounces_AddOptionsErrorAtLine80(t *testing.T) {
 func TestGetBounces_ComprehensiveAddOptionsCoverage(t *testing.T) {
 	client, _, _, teardown := setup()
 	defer teardown()
-	
+
 	// Test different SuppressionListOptions configurations to ensure
 	// all query parameter encoding paths are covered
 	testCases := []struct {
@@ -1273,7 +1273,7 @@ func TestGetBounces_ComprehensiveAddOptionsCoverage(t *testing.T) {
 			opts: &SuppressionListOptions{StartTime: 1609459200},
 		},
 		{
-			name: "with_end_time_only", 
+			name: "with_end_time_only",
 			opts: &SuppressionListOptions{EndTime: 1612137600},
 		},
 		{
@@ -1299,16 +1299,16 @@ func TestGetBounces_ComprehensiveAddOptionsCoverage(t *testing.T) {
 			},
 		},
 	}
-	
+
 	basePath := "/suppression/bounces"
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Test the AddOptions call that occurs in GetBounces at line 80
 			resultPath, err := client.AddOptions(basePath, tc.opts)
 			assert.NoError(t, err)
 			assert.NotEqual(t, basePath, resultPath, "Path should be modified when options are provided")
-			
+
 			// Test error scenario with same options but invalid path
 			invalidPath := "://bad-scheme-" + tc.name
 			_, err = client.AddOptions(invalidPath, tc.opts)

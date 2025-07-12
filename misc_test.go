@@ -102,7 +102,7 @@ func TestErrorResponseErr(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			resp := ErrorResponse{Error: tt.error}
 			err := resp.Err()
-			
+
 			if tt.expected {
 				assert.Error(t, err)
 				assert.Equal(t, tt.error, err.Error())
@@ -116,7 +116,7 @@ func TestErrorResponseErr(t *testing.T) {
 func TestRateLimitedErrorError(t *testing.T) {
 	retryAfter := 30 * time.Second
 	err := &RateLimitedError{RetryAfter: retryAfter}
-	
+
 	expected := "sendgrid rate limit exceeded, retry after 30s"
 	assert.Equal(t, expected, err.Error())
 }
@@ -165,7 +165,7 @@ func TestErrorsResponseErrs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			resp := ErrorsResponse{Errors: tt.errors}
 			err := resp.Errs()
-			
+
 			if tt.hasError {
 				assert.Error(t, err)
 				assert.Equal(t, tt.expected, err.Error())
@@ -181,7 +181,7 @@ func TestStatusCodeError(t *testing.T) {
 		Code:   500,
 		Status: "500 Internal Server Error",
 	}
-	
+
 	assert.Equal(t, "sendgrid server error: 500 Internal Server Error", err.Error())
 	assert.Equal(t, 500, err.HTTPStatusCode())
 }
@@ -191,51 +191,51 @@ func TestCheckStatusCode(t *testing.T) {
 	debug := &mockDebug{debug: true}
 
 	tests := []struct {
-		name           string
-		statusCode     int
-		headers        map[string]string
-		body           string
-		expectedError  string
+		name              string
+		statusCode        int
+		headers           map[string]string
+		body              string
+		expectedError     string
 		shouldReturnError bool
 	}{
 		{
-			name:       "success 200",
-			statusCode: 200,
-			body:       `{"success": true}`,
+			name:              "success 200",
+			statusCode:        200,
+			body:              `{"success": true}`,
 			shouldReturnError: false,
 		},
 		{
-			name:       "success 201",
-			statusCode: 201,
-			body:       `{"created": true}`,
+			name:              "success 201",
+			statusCode:        201,
+			body:              `{"created": true}`,
 			shouldReturnError: false,
 		},
 		{
-			name:       "rate limit with valid header",
-			statusCode: 429,
-			headers:    map[string]string{"X-RateLimit-Reset": strconv.FormatInt(time.Now().Add(30*time.Second).Unix(), 10)},
-			expectedError: "sendgrid rate limit exceeded",
+			name:              "rate limit with valid header",
+			statusCode:        429,
+			headers:           map[string]string{"X-RateLimit-Reset": strconv.FormatInt(time.Now().Add(30*time.Second).Unix(), 10)},
+			expectedError:     "sendgrid rate limit exceeded",
 			shouldReturnError: true,
 		},
 		{
-			name:       "rate limit with invalid header",
-			statusCode: 429,
-			headers:    map[string]string{"X-RateLimit-Reset": "invalid"},
-			expectedError: "invalid syntax",
+			name:              "rate limit with invalid header",
+			statusCode:        429,
+			headers:           map[string]string{"X-RateLimit-Reset": "invalid"},
+			expectedError:     "invalid syntax",
 			shouldReturnError: true,
 		},
 		{
-			name:       "errors response",
-			statusCode: 400,
-			body:       `{"errors": [{"message": "validation failed"}]}`,
-			expectedError: "message: validation failed",
+			name:              "errors response",
+			statusCode:        400,
+			body:              `{"errors": [{"message": "validation failed"}]}`,
+			expectedError:     "message: validation failed",
 			shouldReturnError: true,
 		},
 		{
-			name:       "status code error fallback",
-			statusCode: 500,
-			body:       `invalid json`,
-			expectedError: "sendgrid server error: 500 Internal Server Error",
+			name:              "status code error fallback",
+			statusCode:        500,
+			body:              `invalid json`,
+			expectedError:     "sendgrid server error: 500 Internal Server Error",
 			shouldReturnError: true,
 		},
 	}
@@ -256,7 +256,7 @@ func TestCheckStatusCode(t *testing.T) {
 			}
 
 			err := checkStatusCode(resp, debug)
-			
+
 			if tt.shouldReturnError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tt.expectedError)
@@ -280,7 +280,7 @@ func TestCheckStatusCodeErrorResponse(t *testing.T) {
 	}
 
 	err := checkStatusCode(resp, debug)
-	
+
 	assert.Error(t, err)
 	// Due to how the function works, first it tries to parse as ErrorsResponse which fails
 	// Then it tries ErrorResponse which also fails because body is already consumed
@@ -309,7 +309,7 @@ func TestLogResponse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			debug := &mockDebug{debug: tt.debug}
-			
+
 			resp := &http.Response{
 				StatusCode: 200,
 				Status:     "200 OK",
@@ -318,7 +318,7 @@ func TestLogResponse(t *testing.T) {
 			}
 
 			err := logResponse(resp, debug)
-			
+
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
@@ -330,7 +330,7 @@ func TestLogResponse(t *testing.T) {
 
 func TestLogResponseError(t *testing.T) {
 	debug := &mockDebug{debug: true}
-	
+
 	// Create a response with nil body reader to cause httputil.DumpResponse to fail
 	resp := &http.Response{
 		StatusCode: 200,
@@ -369,13 +369,13 @@ func TestNewJSONParser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var dst testStruct
 			parser := newJSONParser(&dst)
-			
+
 			resp := &http.Response{
 				Body: &mockReadCloser{strings.NewReader(tt.body)},
 			}
 
 			err := parser(resp)
-			
+
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

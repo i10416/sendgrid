@@ -329,7 +329,7 @@ func TestUpdateInboundParseWebhook_NewRequestError(t *testing.T) {
 
 	// Call method with appropriate parameters
 	input := &InputUpdateInboundParseWebhook{
-		URL:      "https://example.com/updated-parse",
+		URL:       "https://example.com/updated-parse",
 		SpamCheck: true,
 	}
 	_, err := client.UpdateInboundParseWebhook(context.TODO(), "mail.example.com", input)
@@ -362,4 +362,3 @@ func TestDeleteInboundParseWebhook_NewRequestError(t *testing.T) {
 
 	client.baseURL = originalBaseURL
 }
-
