@@ -79,7 +79,7 @@ func New(apiKey string, options ...Option) *Client {
 		apiKey:     apiKey,
 		baseURL:    defaultBaseURL,
 		httpclient: &http.Client{},
-		log:        log.New(os.Stderr, "kenzo0107/sendgrid", log.LstdFlags|log.Lshortfile),
+		log:        log.New(os.Stderr, "i10416/sendgrid", log.LstdFlags|log.Lshortfile),
 	}
 
 	for _, opt := range options {

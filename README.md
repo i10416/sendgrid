@@ -1,7 +1,7 @@
 # SendGrid API in Go
 
-[![GoDoc](https://godoc.org/github.com/kenzo0107/sendgrid?status.svg)](https://godoc.org/github.com/kenzo0107/sendgrid) [![test](https://github.com/kenzo0107/sendgrid/actions/workflows/test.yml/badge.svg)](https://github.com/kenzo0107/sendgrid/actions/workflows/test.yml) [![lint](https://github.com/kenzo0107/sendgrid/actions/workflows/lint.yml/badge.svg)](https://github.com/kenzo0107/sendgrid/actions/workflows/lint.yml)
-[![codecov](https://codecov.io/gh/kenzo0107/sendgrid/branch/main/graph/badge.svg)](https://codecov.io/gh/kenzo0107/sendgrid)
+[![GoDoc](https://godoc.org/github.com/i10416/sendgrid?status.svg)](https://godoc.org/github.com/i10416/sendgrid) [![test](https://github.com/i10416/sendgrid/actions/workflows/test.yml/badge.svg)](https://github.com/i10416/sendgrid/actions/workflows/test.yml) [![lint](https://github.com/i10416/sendgrid/actions/workflows/lint.yml/badge.svg)](https://github.com/i10416/sendgrid/actions/workflows/lint.yml)
+[![codecov](https://codecov.io/gh/i10416/sendgrid/branch/main/graph/badge.svg)](https://codecov.io/gh/i10416/sendgrid)
 
 This library supports most if not all of the [SendGrid](https://sendgrid.com) REST calls.
 
@@ -9,7 +9,7 @@ This library supports most if not all of the [SendGrid](https://sendgrid.com) RE
 
 ### _go get_
 
-    $ go get -u github.com/kenzo0107/sendgrid
+    $ go get -u github.com/i10416/sendgrid
 
 ## Example
 
@@ -23,7 +23,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kenzo0107/sendgrid"
+	"github.com/i10416/sendgrid"
 )
 
 func main() {
@@ -41,4 +41,4 @@ func main() {
 
 ## License
 
-[MIT License](https://github.com/kenzo0107/sendgrid/blob/main/LICENSE)
+[MIT License](https://github.com/i10416/sendgrid/blob/main/LICENSE)

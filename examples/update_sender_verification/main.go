@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kenzo0107/sendgrid"
+	"github.com/i10416/sendgrid"
 )
 
 func main() {
