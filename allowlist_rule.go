@@ -6,6 +6,10 @@ import (
 	"net/url"
 )
 
+type OutputGetAllowlistRule struct {
+	Result AllowlistRule `json:"result"`
+}
+
 type AllowlistRule struct {
 	ID int64  `json:"id"`
 	Ip string `json:"ip"`
@@ -19,12 +23,12 @@ func (c *Client) GetAllowlistRule(ctx context.Context, id int64) (*AllowlistRule
 		return nil, err
 	}
 
-	r := AllowlistRule{}
+	r := OutputGetAllowlistRule{}
 	if err := c.Do(ctx, req, &r); err != nil {
 		return nil, err
 	}
 
-	return &r, nil
+	return &r.Result, nil
 }
 
 type InputCreateAllowlistRuleIp struct {
